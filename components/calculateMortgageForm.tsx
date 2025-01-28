@@ -1,8 +1,11 @@
 import { MortgageFormData } from "@/types/mortgage";
-import { useState } from "react";
+import { CalculateMortgageFormSchema } from "@/utils/schema/mortgage";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 type CalculateMortgageFormProps = {
     defualtInterestRate: number;
@@ -10,96 +13,112 @@ type CalculateMortgageFormProps = {
 };
 
 export default function CalculateMortgageForm({ defualtInterestRate, handleSubmit }: CalculateMortgageFormProps) {
-
-    const [formData, setFormData] = useState<MortgageFormData>({
-        price: 0,
-        deposit: 0,
-        term: 15,
-        interest: defualtInterestRate
+    const {
+        handleSubmit: handleFormSubmit,
+        register,
+        formState: { errors }
+    } = useForm<z.infer<typeof CalculateMortgageFormSchema>>({
+        resolver: zodResolver(CalculateMortgageFormSchema),
+        mode: 'onSubmit',
+        defaultValues: {
+            price: 0,
+            deposit: 0,
+            term: 15,
+            interest: defualtInterestRate
+        }
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        console.log(name, value);
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: parseFloat(value) || 0
-        }));
-    };
-
-    const submitForm = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        handleSubmit(formData);
+    const submitForm = (data: z.infer<typeof CalculateMortgageFormSchema>) => {
+        handleSubmit(data);
     };
 
     return (
-        <Form onSubmit={submitForm}>
+        <Form onSubmit={handleFormSubmit(submitForm)}>
             <Form.Label htmlFor="price">Property Price</Form.Label>
             <InputGroup className="mb-3">
                 <InputGroup.Text>£</InputGroup.Text>
                 <Form.Control
                     id="price"
-                    name="price"
                     type="number"
                     required
                     className="no-spinner"
                     step="any"
                     aria-label="Property price (to the nearest pound)"
                     aria-describedby="price-description"
-                    value={formData.price || ""}
-                    onChange={handleInputChange}
+                    {...register('price', { valueAsNumber: true })}
+                    isInvalid={!!errors.price}
                 />
+                {errors.price && (
+                    <Form.Control.Feedback type="invalid">
+                        {errors.price.message}
+                    </Form.Control.Feedback>
+                )}
             </InputGroup>
             <Form.Label htmlFor="deposit">Deposit</Form.Label>
             <InputGroup className="mb-3">
                 <InputGroup.Text>£</InputGroup.Text>
                 <Form.Control
                     id="deposit"
-                    name="deposit"
                     type="number"
                     required
                     className="no-spinner"
                     step="any"
                     aria-label="Deposit amount (to the nearest pound)"
                     aria-describedby="deposit-description"
-                    value={formData.deposit || ""}
-                    onChange={handleInputChange}
+                    {...register('deposit', { valueAsNumber: true })}
+                    isInvalid={!!errors.deposit}
                 />
+                {errors.deposit && (
+                    <Form.Control.Feedback type="invalid">
+                        {errors.deposit.message}
+                    </Form.Control.Feedback>
+                )}
             </InputGroup>
 
             <Form.Label htmlFor="term">Mortgage Term</Form.Label>
             <InputGroup className="mb-3">
                 <Form.Control
                     id="termInYears"
-                    name="term"
                     required
                     type="number"
                     step="any"
                     aria-label="Mortgage term in years"
                     aria-describedby="term-description"
-                    value={formData.term || ""}
-                    onChange={handleInputChange}
+                    {...register('term', { valueAsNumber: true })}
+                    isInvalid={!!errors.term}
                 />
+                { }
                 <InputGroup.Text>years</InputGroup.Text>
+                {errors.term && (
+                    <Form.Control.Feedback type="invalid">
+                        {errors.term.message}
+                    </Form.Control.Feedback>
+                )}
             </InputGroup>
             <Form.Label htmlFor="interest">Interest rate</Form.Label>
             <InputGroup className="mb-3">
                 <Form.Control
                     id="annualInterestRate"
-                    name="interest"
                     type="number"
                     step="any"
                     required
                     className="no-spinner"
                     aria-label="Annual interest rate"
                     aria-describedby="interest-description"
-                    value={formData.interest || ""}
-                    onChange={handleInputChange}
+                    {...register("interest", { valueAsNumber: true })}
+                    isInvalid={!!errors.interest}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
+                {errors.interest && (
+                    <Form.Control.Feedback type="invalid">
+                        {errors.interest.message}
+                    </Form.Control.Feedback>
+                )}
             </InputGroup>
-            <Button className="w-full" variant="primary" type="submit">
+            <Button
+                className="w-full"
+                variant="primary"
+                type="submit">
                 Calculate
             </Button>
         </Form>
