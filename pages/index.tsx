@@ -17,6 +17,10 @@ export const getServerSideProps = (async () => {
   return { props: data };
 }) satisfies GetServerSideProps<InterestRateData>
 
+/**
+ * FOR NO JS SUPPORT, We can use nextjs app router with server action. 
+ */
+
 export default function MortgageCalculator({ date, rate }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const {
     results,
