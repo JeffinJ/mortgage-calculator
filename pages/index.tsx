@@ -25,8 +25,6 @@ export default function MortgageCalculator({ date, rate }: InferGetServerSidePro
   } = useMortgageCalculator();
 
   const handleSubmit = (mortgageFormData: MortgageFormData) => {
-    console.log('Form data:', mortgageFormData);
-    
     calculateMortgage({
       propertyPrice: mortgageFormData.price,
       deposit: mortgageFormData.deposit,
