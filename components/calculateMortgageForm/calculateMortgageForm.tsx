@@ -29,6 +29,7 @@ export default function CalculateMortgageForm({ defaultFormData, handleSubmit }:
 
     return (
         <Form
+            role="form"
             action=""
             method="POST">
             <Form.Label htmlFor="price">Property Price</Form.Label>
@@ -37,6 +38,7 @@ export default function CalculateMortgageForm({ defaultFormData, handleSubmit }:
                 <Form.Control
                     id="price"
                     type="number"
+                    data-testid="price-input"
                     required
                     className="no-spinner"
                     step="any"

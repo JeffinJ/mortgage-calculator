@@ -1,4 +1,4 @@
-import { YearlyBreakdown } from "@/types/mortgage";
+import { FullMortgageResults, MortgageInputs, YearlyBreakdown } from "@/types/mortgage";
 
 /**
  * Calculates the monthly mortgage payment.
@@ -145,5 +145,57 @@ export function validateMortgageInputs(
   return {
     isValid: Object.keys(errors).length === 0,
     errors
+  };
+}
+
+export function calculateMortgageResults(inputs: MortgageInputs): FullMortgageResults | null {
+  const validation = validateMortgageInputs(
+    inputs.price,
+    inputs.deposit,
+    inputs.interest,
+    inputs.term
+  );
+
+  if (!validation.isValid) {
+    return null;
+  }
+
+  const monthlyPayment = calculateMonthlyPayment(
+    inputs.price,
+    inputs.deposit,
+    inputs.interest,
+    inputs.term
+  );
+
+  const totalRepayment = calculateTotalRepayment(
+    monthlyPayment,
+    inputs.term
+  );
+
+  const capital = inputs.price - inputs.deposit;
+  const interest = totalRepayment - capital;
+
+  const affordabilityCheck = calculateAffordabilityCheck(
+    inputs.price,
+    inputs.deposit,
+    inputs.interest,
+    inputs.term
+  );
+
+  const yearlyBreakdown = calculateYearlyBreakdown(
+    inputs.price,
+    inputs.deposit,
+    inputs.interest,
+    inputs.term,
+    monthlyPayment
+  );
+
+  return {
+    monthlyPayment,
+    totalRepayment,
+    capital,
+    interest,
+    affordabilityCheck,
+    yearlyBreakdown
   };
 }

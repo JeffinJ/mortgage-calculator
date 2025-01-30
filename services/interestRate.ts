@@ -11,7 +11,6 @@ export class InterestRateService {
             const data = await this.parseRateResponse(response);
             return this.validateRateData(data);
         } catch (error) {
-            console.error('Error fetching interest rate:', error);
             return {
                 date: new Date().toISOString(),
                 rate: this.FALLBACK_RATE

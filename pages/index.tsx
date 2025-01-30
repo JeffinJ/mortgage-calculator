@@ -1,12 +1,7 @@
 import { config } from '@/lib/env'
-import { FullMortgageResults, MortgageFormData } from "@/types/mortgage";
+import { FullMortgageResults, MortgageFormData, MortgageInputs } from "@/types/mortgage";
 import {
-  calculateAffordabilityCheck,
-  calculateMonthlyPayment,
-  calculateTotalRepayment,
-  calculateYearlyBreakdown,
-  validateMortgageInputs
-} from "@/utils/MortgageCalculator/calculateRepayment";
+  calculateMortgageResults} from "@/utils/MortgageCalculator/calculateRepayment";
 import { GetServerSideProps } from "next";
 import bodyParser from "body-parser";
 import util from "util";
@@ -15,17 +10,16 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { InterestRateService } from "@/services/interestRate";
 import MortgageInfo from "@/components/mortgageInfo";
-import CalculateMortgageForm from "@/components/calculateMortgageForm";
+import CalculateMortgageForm from "@/components/calculateMortgageForm/calculateMortgageForm";
 import MortgageYearlyBreakdown from "@/components/mortgageYearlyBreakdown";
 const getBody = util.promisify(bodyParser.urlencoded());
 
-type PageProps = {
+export type HomePageProps = {
   formData: MortgageFormData;
   results?: FullMortgageResults;
 };
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
-
+export const getServerSideProps: GetServerSideProps<HomePageProps> = async (context) => {
   const URL = config.api.interestRateUrl;
   const interestRateData = await InterestRateService.fetchCurrentRate(URL);
 
@@ -50,70 +44,19 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
       formData.term = Number(body.term);
       formData.interest = Number(body.interest);
 
-      const inputs = {
-        propertyPrice: Number(body.price),
-        deposit: Number(body.deposit),
-        annualInterestRate: Number(body.interest),
-        termInYears: Number(body.term)
+      const mortgageInputs: MortgageInputs = {
+        price: formData.price,
+        deposit: formData.deposit,
+        term: formData.term,
+        interest: formData.interest
       };
 
-      const validation = validateMortgageInputs(
-        inputs.propertyPrice,
-        inputs.deposit,
-        inputs.annualInterestRate,
-        inputs.termInYears
-      );
-
-      if (!validation.isValid) {
-        return {
-          props: {
-            formData,
-          }
-        };
-      }
-
-      // Calculate mortgage details
-      const monthlyPayment = calculateMonthlyPayment(
-        inputs.propertyPrice,
-        inputs.deposit,
-        inputs.annualInterestRate,
-        inputs.termInYears
-      );
-
-      const totalRepayment = calculateTotalRepayment(
-        monthlyPayment,
-        inputs.termInYears
-      );
-
-      const capital = inputs.propertyPrice - inputs.deposit;
-      const interest = totalRepayment - capital;
-
-      const affordabilityCheck = calculateAffordabilityCheck(
-        inputs.propertyPrice,
-        inputs.deposit,
-        inputs.annualInterestRate,
-        inputs.termInYears
-      );
-
-      const yearlyBreakdown = calculateYearlyBreakdown(
-        inputs.propertyPrice,
-        inputs.deposit,
-        inputs.annualInterestRate,
-        inputs.termInYears,
-        monthlyPayment
-      );
+      const results = calculateMortgageResults(mortgageInputs);
 
       return {
         props: {
           formData,
-          results: {
-            monthlyPayment,
-            totalRepayment,
-            capital,
-            interest,
-            affordabilityCheck,
-            yearlyBreakdown
-          },
+          results: results || undefined
         }
       };
     } catch (error) {
@@ -133,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
   };
 };
 
-export default function Page({ formData, results }: PageProps) {
+export default function HomePage({ formData, results }: HomePageProps) {
 
   return (
     <Container>
