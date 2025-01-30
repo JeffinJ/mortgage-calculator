@@ -8,32 +8,29 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 type CalculateMortgageFormProps = {
-    defualtInterestRate: number;
+    defaultFormData: MortgageFormData;
     handleSubmit: (formData: MortgageFormData) => void;
 };
 
-export default function CalculateMortgageForm({ defualtInterestRate, handleSubmit }: CalculateMortgageFormProps) {
+export default function CalculateMortgageForm({ defaultFormData, handleSubmit }: CalculateMortgageFormProps) {
     const {
-        handleSubmit: handleFormSubmit,
         register,
         formState: { errors }
     } = useForm<z.infer<typeof CalculateMortgageFormSchema>>({
         resolver: zodResolver(CalculateMortgageFormSchema),
-        mode: 'onSubmit',
+        mode: 'onBlur',
         defaultValues: {
-            price: 0,
-            deposit: 0,
-            term: 15,
-            interest: defualtInterestRate
+            price: defaultFormData.price,
+            deposit: defaultFormData.deposit,
+            term: defaultFormData.term,
+            interest: defaultFormData.interest
         }
     });
 
-    const submitForm = (data: z.infer<typeof CalculateMortgageFormSchema>) => {
-        handleSubmit(data);
-    };
-
     return (
-        <Form onSubmit={handleFormSubmit(submitForm)}>
+        <Form
+            action=""
+            method="POST">
             <Form.Label htmlFor="price">Property Price</Form.Label>
             <InputGroup className="mb-3">
                 <InputGroup.Text>£</InputGroup.Text>
