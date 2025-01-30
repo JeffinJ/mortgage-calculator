@@ -1,3 +1,4 @@
+import { config } from '@/lib/env'
 import { FullMortgageResults, MortgageFormData } from "@/types/mortgage";
 import {
   calculateAffordabilityCheck,
@@ -25,8 +26,7 @@ type PageProps = {
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
 
-  const URL = process.env.INTEREST_RATE_API_URL;
-  if (!URL) throw new Error('INTEREST_RATE_API_URL not found');
+  const URL = config.api.interestRateUrl;
   const interestRateData = await InterestRateService.fetchCurrentRate(URL);
 
   const { req, res } = context as any;
