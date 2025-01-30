@@ -24,10 +24,8 @@ function validateEnv() {
     return parsed.data
 }
 
-// Create a strongly-typed config object
 export const env = validateEnv()
 
-// Type helper for config object
 type Config = {
     env: typeof env.NODE_ENV
     isProduction: boolean
@@ -36,7 +34,6 @@ type Config = {
     }
 }
 
-// Export the config object with specific structure
 export const config: Config = {
     env: env.NODE_ENV,
     isProduction: env.NODE_ENV === 'production',

@@ -1,6 +1,5 @@
 import { InterestRateService } from "./interestRate";
 
-// Mock fetch globally
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
@@ -8,7 +7,6 @@ describe('InterestRateService', () => {
     const TEST_API_URL = 'https://www.bankofengland.co.uk/boeapps/iadb/fromshowcolumns.asp?csv.x=yes&Datefrom=18/Jan/2024&Dateto=18/Feb/2024&SeriesCodes=IUMABEDR&CSVF=TN&UsingCodes=Y&VPD=Y&VFD=N';
 
     beforeEach(() => {
-        // Clear mock before each test
         mockFetch.mockClear();
     });
 
@@ -54,9 +52,8 @@ describe('InterestRateService', () => {
         });
 
         test('should handle multiple lines of data and use the latest', async () => {
-            const mockResponse = `Date,Rate
-2025-01-29,4.2
-2025-01-30,4.5`;
+            const mockResponse =
+                `Date,Rate 2025-01-29,4.2 2025-01-30,4.5`;
 
             mockFetch.mockResolvedValueOnce({
                 ok: true,

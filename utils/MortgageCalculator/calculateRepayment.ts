@@ -148,6 +148,12 @@ export function validateMortgageInputs(
   };
 }
 
+/**
+ * Calculates mortgage results based on user inputs.
+ *
+ * @param inputs - User inputs for the mortgage calculator.
+ * @returns Object containing mortgage results.
+ */
 export function calculateMortgageResults(inputs: MortgageInputs): FullMortgageResults | null {
   const validation = validateMortgageInputs(
     inputs.price,
